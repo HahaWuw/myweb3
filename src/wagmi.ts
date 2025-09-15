@@ -10,7 +10,7 @@ import {
 
 export const config = getDefaultConfig({
   appName: 'RainbowKit App',
-  projectId: 'YOUR_PROJECT_ID',
+  projectId: '324ee85d54f6b58060768e82ee9cc4c3',
   chains: [
     mainnet,
     polygon,
@@ -21,3 +21,5 @@ export const config = getDefaultConfig({
   ],
   ssr: true,
 });
+
+
