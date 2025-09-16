@@ -8,7 +8,7 @@ export default function TransferListenerPage() {
   const [events, setEvents] = useState<any[]>([]);
 
   // ERC-20 合约地址 (换成你自己的代币地址)
-  const tokenAddress = "0xYourTokenAddressHere";
+  const tokenAddress = "0x496ca6cd43c1ee0ecb307179ae08fa80fd3c630f";
   const abi = [
     "event Transfer(address indexed from, address indexed to, uint256 value)"
   ];

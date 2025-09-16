@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { createPublicClient, http } from "viem";
-import { mainnet } from "viem/chains";
+import { sepolia } from "viem/chains";
 
 const client = createPublicClient({
-  chain: mainnet,
+  chain: sepolia,
   transport: http() 
   // 这里最好换成 Infura/Alchemy 的主网 RPChttps://eth-mainnet.g.alchemy.com/v2/你的API_KEY
 });
@@ -18,7 +18,7 @@ export default function BalanceChecker() {
   const handleCheckBalance = async () => {
     try {
       setLoading(true);
-      const result = await client.getBalance({ address: '0x5def82d23A4cB5AF793e7a1831B0e1b6356C9985' });
+      const result = await client.getBalance({ address: address});
       const eth = Number(result) / 1e18; // wei → ETH
       setBalance(eth.toFixed(6));
     } catch (error) {
@@ -30,7 +30,9 @@ export default function BalanceChecker() {
   };
 
   return (
+
     <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
+      <div>------------------viem------------------</div>
       <h1 className="text-xl font-bold">ETH 余额查询</h1>
       <input
         type="text"

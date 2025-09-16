@@ -10,7 +10,7 @@ export default function EethersButton() {
   const [tokenBalance, setTokenBalance] = useState<string>("");
 
   // ERC-20 合约配置
-  const tokenAddress = "0xYourTokenAddress"; // 换成你要交互的 ERC-20 地址
+  const tokenAddress = "0x496ca6cd43c1ee0ecb307179ae08fa80fd3c630f"; // 换成你要交互的 ERC-20 地址
   const tokenAbi = [
     "function balanceOf(address owner) view returns (uint256)",
     "function transfer(address to, uint256 amount) returns (bool)",
