@@ -1,31 +1,61 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import Info from '../components/Info'
-import ContractInfo from './contractInfo'
-import BalanceChecker from './BalanceChecker';
-import SendEthButton from './SendEthButton';
-import TokenBalanceChecker from './TokenBalanceChecker';
-import TransferListenerPage from './transferListener';
+
 import EthersButton from './ethersButton';
 
 const Home: NextPage = () => {
+  const router = useRouter();
   return (
     <div className={styles.container}>
       <main className={styles.main}>
         <ConnectButton />
-        <Info></Info>
-        <ContractInfo></ContractInfo>
-        {/* 使用 viem 连接以太坊主网，查询一个地址的余额 */}
-        <BalanceChecker />
-        {/* 使用 WalletClient 发送交易，发送 ETH 到另一个地址 */}
-        <SendEthButton />
-        {/* 调用一个 ERC-20 合约的 balanceOf 方法 */}
-        <TokenBalanceChecker/>
-        {/* 监听 ERC-20 合约的 Transfer 事件 */}
-        <TransferListenerPage />
-        {/* ethers调用合约读写方法 */}
-        <EthersButton />
+        <h1 className={styles.title}>
+          Hi, web3
+        </h1>
+        <div className={styles.grid}>
+
+          <div className={styles.card}>
+            <h2>RainbowKit Documentation &rarr;</h2>
+            <p>Learn how to use RainbowKit.</p>
+            <p style={{'fontSize':'16px'}}>集成钱包多供应商</p>
+            {/* <button className={styles.coolbutton} onClick={() => router.push('/contractInfo')}>
+            go
+            </button> */}
+            {/* <h5>可以集成多个钱包</h5> */}
+          </div>
+
+          <div className={styles.card}>
+            <h2>wagmi Documentation &rarr;</h2>
+            <p>Learn how to use Wagmi.</p>
+            <p style={{'fontSize':'16px'}}>实现钱包连接基础功能</p>
+            <button className={styles.coolbutton} style={{'color':'lightblue'}} onClick={() => router.push('/contractInfo')}>
+            go
+            </button>
+          </div>
+
+          <div
+            className={styles.card}
+          >
+            <h2>viem Documentation &rarr;</h2>
+            <p>Learn how to use viem.</p>
+            <p style={{'fontSize':'16px'}}>调用钱包读写、监听、转账功能</p>
+            <button className={styles.coolbutton} style={{'color':'rebeccapurple'}} onClick={() => router.push('/viemcontract')}>
+            go
+            </button>
+          </div>
+
+          <div className={styles.card} >
+            <h2>ethers Documentation &rarr;</h2>
+            <p>Learn how to use ethers.</p>
+            <p style={{'fontSize':'16px'}}>调用钱包读写、监听、转账功能</p>
+            <button className={styles.coolbutton} style={{'color':'lightseagreen'}} onClick={() => router.push('/ethersButton')}>
+            go
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   );

@@ -42,6 +42,7 @@ export default function SendEthButton() {
 
   return (
     <div className="p-4 border rounded shadow-md space-y-2">
+      <h3>发送交易&转账</h3>
       <button
         onClick={handleSend}
         disabled={loading}

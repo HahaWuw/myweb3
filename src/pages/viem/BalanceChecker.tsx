@@ -1,6 +1,6 @@
 "use client"; // 如果你用的是 Next.js 13+ 要加这一行
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 
@@ -14,10 +14,11 @@ export default function BalanceChecker() {
   const [address, setAddress] = useState("");
   const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const handleCheckBalance = async () => {
     try {
       setLoading(true);
+      const [account] = await window.ethereum.request({ method: 'eth_requestAccounts' })
+      setAddress(account)
       const result = await client.getBalance({ address: address});
       const eth = Number(result) / 1e18; // wei → ETH
       setBalance(eth.toFixed(6));
@@ -32,11 +33,11 @@ export default function BalanceChecker() {
   return (
 
     <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
-      <div>------------------viem------------------</div>
-      <h1 className="text-xl font-bold">ETH 余额查询</h1>
+      <h3 className="text-xl font-bold">ETH 余额查询</h3>
+      <div>钱包地址：{address}</div>
       <input
         type="text"
-        placeholder="输入以太坊地址"
+        placeholder="输入钱包地址"
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         className="border p-2 w-full rounded"

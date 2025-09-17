@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { useWalletClient } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function TransferListenerPage() {
   const { data: walletClient } = useWalletClient();
@@ -51,10 +50,7 @@ export default function TransferListenerPage() {
 
   return (
     <main style={{ padding: "20px" }}>
-      <h1>ERC-20 Transfer 事件监听</h1>
-      <ConnectButton />
-
-      <h2>实时事件日志</h2>
+      <h3>ERC-20 Transfer 事件监听(实时事件日志)</h3>
       {events.length === 0 && <p>暂无事件，试试转账代币触发</p>}
       <ul>
         {events.map((e, idx) => (
