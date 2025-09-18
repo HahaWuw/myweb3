@@ -11,8 +11,8 @@ export default function HomePage() {
       </div>
 
       <EthersDemo
-        tokenAddress="0x496ca6cd43c1ee0ecb307179ae08fa80fd3c630f"
-        rpcUrl="https://eth-mainnet.g.alchemy.com/v2/RZMNlxQLB6s5mXe0rVElF"
+        tokenAddress="0xc8731481ddd213e81e77a00cb16b5a499a9f63be"
+        rpcUrl="https://eth-sepolia.g.alchemy.com/v2/RZMNlxQLB6s5mXe0rVElF"
         decimals={18}
       />
     </div>

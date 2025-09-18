@@ -1,7 +1,7 @@
 import { useAccount, useBalance } from 'wagmi'
 import React from 'react'
 
-const CONTRACT_ADDRESS = '0x496ca6cd43c1ee0ecb307179ae08fa80fd3c630f'
+const CONTRACT_ADDRESS = '0xc8731481ddd213e81e77a00cb16b5a499a9f63be'
 
 const Info = () => {
     const { address, isConnected } = useAccount()

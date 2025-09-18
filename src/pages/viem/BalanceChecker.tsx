@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
+import { InjectedWalletClient } from "viem/wallets/injected"
 
 const client = createPublicClient({
   chain: sepolia,
-  transport: http() 
+  transport: http("https://eth-sepolia.g.alchemy.com/v2/RZMNlxQLB6s5mXe0rVElF") 
   // 这里最好换成 Infura/Alchemy 的主网 RPChttps://eth-mainnet.g.alchemy.com/v2/你的API_KEY
 });
+
 
 export default function BalanceChecker() {
   const [address, setAddress] = useState("");
@@ -30,11 +32,18 @@ export default function BalanceChecker() {
     }
   };
 
+  const getWalletAddress = async () => {
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
+    console.log("钱包地址:", accounts[0])
+    setAddress(accounts[0])
+  }
+
   return (
 
     <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
       <h3 className="text-xl font-bold">ETH 余额查询</h3>
       <div>钱包地址：{address}</div>
+      <button onClick={getWalletAddress}>查看地址</button>
       <input
         type="text"
         placeholder="输入钱包地址"

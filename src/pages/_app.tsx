@@ -4,7 +4,7 @@ import type { AppProps } from 'next/app';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, createConfig } from 'wagmi';
-import { getDefaultWallets, RainbowKitProvider, midnightTheme } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, midnightTheme } from '@rainbow-me/rainbowkit';
 import { config } from '../wagmi';
 
 const client = new QueryClient();

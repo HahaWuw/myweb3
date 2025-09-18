@@ -16,6 +16,8 @@ export default function EthersDemo({ tokenAddress, rpcUrl, decimals = 18 }: Ethe
   const [ethBalance, setEthBalance] = useState<string>('0')
   const [tokenBalance, setTokenBalance] = useState<string>('0')
   const [logs, setLogs] = useState<string[]>([])
+  // const [decimals, setDecimals] = useState<number>(18);
+  const [contract, setContract] = useState<any>(null);
 
   const erc20Abi = [
     "function balanceOf(address owner) view returns (uint256)",
@@ -56,14 +58,22 @@ export default function EthersDemo({ tokenAddress, rpcUrl, decimals = 18 }: Ethe
   // 发送 ETH
   const sendEth = async () => {
     if (!signer) return
-    const tx = await signer.sendTransaction({
-      to: userAddress, // 示例: 发给自己
-      value: ethers.parseEther("0.001")
-    })
-    console.log("交易已发送:", tx)
-    await tx.wait()
-    console.log("交易确认完成")
-    fetchEthBalance()
+    try{
+      const tx = await signer.sendTransaction({
+        to: userAddress, // 示例: 发给自己
+        value: ethers.parseEther("0.001")
+      })
+      console.log("交易已发送:", tx)
+      await tx.wait()
+      console.log("交易确认完成")
+      fetchEthBalance()
+    }catch(error){
+      if (error?.message?.includes('User rejected')) {
+        alert('❌ 用户拒绝了交易。')
+      } else {
+        alert(`⚠️ 发生错误: ${error.message}`)
+      }
+    }
   }
 
   // 监听 Transfer
@@ -93,6 +103,37 @@ export default function EthersDemo({ tokenAddress, rpcUrl, decimals = 18 }: Ethe
     }
   }, [provider, userAddress])
 
+  const startListening = async () => {
+    if (!window.ethereum) {
+      alert("请先安装 MetaMask");
+      return;
+    }
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
+
+    // 获取 decimals
+    // const tokenDecimals = await erc20.decimals();
+    // setDecimals(tokenDecimals);
+
+    erc20.on("Transfer", (from, to, value, event) => {
+      const formatted = ethers.formatUnits(value, decimals);
+      const log = `📢 From: ${from} → To: ${to}, Value: ${formatted}`;
+      setLogs((prev) => [log, ...prev]);
+    });
+
+    setContract(erc20);
+    alert("✅ 已开始监听 Transfer 事件");
+  };
+
+  const stopListening = () => {
+    if (contract) {
+      contract.removeAllListeners("Transfer");
+      setContract(null);
+      alert("⛔ 已停止监听");
+    }
+  };
+
   return (
     <div className="p-4 max-w-lg mx-auto border rounded-lg space-y-4">
       <h2 className="text-xl font-bold">Ethers Demo</h2>
@@ -112,10 +153,47 @@ export default function EthersDemo({ tokenAddress, rpcUrl, decimals = 18 }: Ethe
       )}
 
       <div>
-        <h3 className="font-semibold">最新 Transfer 事件</h3>
-        <div className="max-h-48 overflow-y-auto border p-2 rounded bg-gray-50">
-          {logs.length === 0 ? <p className="text-gray-400">暂无事件</p> :
-            <ul className="space-y-1">{logs.map((log, idx) => <li key={idx}>{log}</li>)}</ul>}
+        <h3 className="font-semibold">调用合约balanceof方法</h3>
+        <div>链上钱包balance： {tokenBalance ? tokenBalance: '请稍候'}</div>
+        <div>合约gas值{ethBalance}-decimals：{decimals}</div>
+        {/* {error && <span style={{color: 'red'}}>报错啦{error}</span>} */}
+      </div>
+
+      <div>
+        <h3 className="font-semibold">监听合约的transfer事件</h3>
+        <button onClick={startListening}>
+          Transfer 1.5 TOKEN
+        </button>
+        {/* <button
+          onClick={startListening}
+          style={{
+            marginRight: "10px",
+            padding: "10px 20px",
+            backgroundColor: "green",
+            color: "white",
+            border: "none",
+            borderRadius: "8px"
+          }}
+        > 开始监听 </button> */}
+        <button
+          onClick={stopListening}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "red",
+            color: "white",
+            border: "none",
+            borderRadius: "8px"
+          }}
+        >
+          停止监听
+        </button>
+        <div style={{ marginTop: "20px" }}>
+          <h3>事件日志：</h3>
+          <ul>
+            {logs.map((log, idx) => (
+              <li key={idx}>{log}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

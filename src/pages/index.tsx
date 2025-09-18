@@ -21,10 +21,6 @@ const Home: NextPage = () => {
             <h2>RainbowKit Documentation &rarr;</h2>
             <p>Learn how to use RainbowKit.</p>
             <p style={{'fontSize':'16px'}}>集成钱包多供应商</p>
-            {/* <button className={styles.coolbutton} onClick={() => router.push('/contractInfo')}>
-            go
-            </button> */}
-            {/* <h5>可以集成多个钱包</h5> */}
           </div>
 
           <div className={styles.card}>

@@ -1,74 +1,128 @@
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import { useWalletClient } from "wagmi";
+'use client'
 
-export default function TransferListenerPage() {
-  const { data: walletClient } = useWalletClient();
-  const [events, setEvents] = useState<any[]>([]);
+import { useState, useEffect } from "react"
+import { createPublicClient, createWalletClient, custom, http, parseUnits } from "viem"
+import { sepolia } from "viem/chains"
+import erc20Abi from "./erc20Abi.json" // ERC-20 ABI，只要 transfer, balanceOf, decimals, Transfer
 
-  // ERC-20 合约地址 (换成你自己的代币地址)
-  const tokenAddress = "0x496ca6cd43c1ee0ecb307179ae08fa80fd3c630f";
-  const abi = [
-    "event Transfer(address indexed from, address indexed to, uint256 value)"
-  ];
+export default function TokenTransfer() {
+  const [address, setAddress] = useState("")
+  const [balance, setBalance] = useState("0")
+  const [txHash, setTxHash] = useState("")
+  const [transferLogs, setTransferLogs] = useState<string[]>([])
 
+  // 1️⃣ 连接钱包
+  const walletClient = typeof window !== "undefined" 
+    ? createWalletClient({
+        chain: sepolia,
+        transport: custom(window.ethereum),
+        account: address
+      })
+    : null
+
+  const publicClient = createPublicClient({
+    chain: sepolia,
+    transport: http("https://eth-sepolia.g.alchemy.com/v2/RZMNlxQLB6s5mXe0rVElF")
+  })
+
+  const tokenAddress = "0xc8731481ddd213e81e77a00cb16b5a499a9f63be"
+
+  // 2️⃣ 获取钱包地址
   useEffect(() => {
-    if (!walletClient) return;
-
-    const run = async () => {
-      // viem 的 walletClient → ethers provider
-      const provider = new ethers.BrowserProvider(walletClient.transport);
-
-      // 合约实例（只读即可）
-      const contract = new ethers.Contract(tokenAddress, abi, provider);
-
-      // 监听 Transfer
-      contract.on("Transfer", (from, to, value, event) => {
-        const formatted = {
-          from,
-          to,
-          value: ethers.formatUnits(value, 18), // 假设代币 18 位精度
-          txHash: event.transactionHash,
-        };
-
-        // 添加到事件列表
-        setEvents((prev) => [formatted, ...prev]);
-      });
-    };
-
-    run();
-
-    // 卸载时移除监听，防止内存泄漏
-    return () => {
+    async function fetchAddress() {
       if (walletClient) {
-        const provider = new ethers.BrowserProvider(walletClient.transport);
-        const contract = new ethers.Contract(tokenAddress, abi, provider);
-        contract.removeAllListeners("Transfer");
+        const accounts = await walletClient.request({ method: "eth_requestAccounts" })
+        setAddress(accounts[0])
       }
-    };
-  }, [walletClient]);
+    }
+    fetchAddress()
+  }, [walletClient])
+
+  // 3️⃣ 获取 token 余额
+  useEffect(() => {
+    async function fetchBalance() {
+      if (address && publicClient) {
+        const decimals = await publicClient.readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "decimals",
+        })
+        const bal = await publicClient.readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [address],
+        })
+        setBalance((Number(bal) / 10 ** Number(decimals)).toString())
+      }
+    }
+    fetchBalance()
+  }, [address, publicClient])
+
+  // 4️⃣ 转账按钮点击
+  const handleTransfer = async () => {
+    if (!walletClient) return
+    try{
+        const amount = parseUnits("1", 18) // 1 token，18 decimals
+        const tx = await walletClient.writeContract({
+          abi: erc20Abi,
+          address: tokenAddress,
+          functionName: "transfer",
+          args: [address, amount],
+        })
+        setTxHash(tx.hash)
+        console.log("交易发送成功:", tx.hash)
+        alert('✅ 转账请求已发送，请在钱包确认。')
+    }catch(error){
+      if (error?.message?.includes('User rejected')) {
+        alert('❌ 用户拒绝了交易。')
+      } else {
+        alert(`⚠️ 发生错误: ${error.message}`)
+      }
+    }
+    
+  }
+
+  // 5️⃣ 监听 Transfer 事件
+  useEffect(() => {
+    if (!publicClient) return
+    const filter = publicClient.createEventFilter({
+      abi: erc20Abi,
+      address: tokenAddress,
+      eventName: "Transfer",
+    })
+
+    const unsubscribe = publicClient.watchEvent({
+      filter,
+      onLogs: (logs) => {
+        logs.forEach((log) => {
+          const from = log.args.from
+          const to = log.args.to
+          const value = log.args.value
+          setTransferLogs((prev) => [
+            `Transfer: ${from} -> ${to} : ${Number(value) / 10 ** 18}`,
+            ...prev,
+          ])
+        })
+      },
+    })
+
+    return () => unsubscribe()
+  }, [publicClient])
 
   return (
-    <main style={{ padding: "20px" }}>
-      <h3>ERC-20 Transfer 事件监听(实时事件日志)</h3>
-      {events.length === 0 && <p>暂无事件，试试转账代币触发</p>}
+    <div>
+      <h3>监听ERC-20 transfer方法</h3>
+      {/* <h2>钱包地址: {address}</h2>
+      <h3>余额: {balance}</h3> */}
+      <button onClick={handleTransfer}>发送 1 token</button>
+      {txHash && <p>交易哈希: {txHash}</p>}
+      <h4>Transfer 事件日志:</h4>
       <ul>
-        {events.map((e, idx) => (
-          <li key={idx} style={{ marginBottom: "10px" }}>
-            <strong>From:</strong> {e.from} <br />
-            <strong>To:</strong> {e.to} <br />
-            <strong>Value:</strong> {e.value} <br />
-            <strong>Tx:</strong>{" "}
-            <a
-              href={`https://sepolia.etherscan.io/tx/${e.txHash}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {e.txHash}
-            </a>
-          </li>
+        {transferLogs.map((log, idx) => (
+          <li key={idx}>{log}</li>
         ))}
       </ul>
-    </main>
-  );
+    </div>
+  )
 }

@@ -41,8 +41,8 @@ const ERC20_ABI = [
 
 export default function TokenBalanceChecker() {
   const [chain, setChain] = useState("sepolia"); // "mainnet" or "sepolia"
-  const [rpcUrl, setRpcUrl] = useState(""); // 可选：填你的 Alchemy/Infura RPC
-  const [tokenAddress, setTokenAddress] = useState("0x496ca6cd43c1ee0ecb307179ae08fa80fd3c630f");
+  const [rpcUrl, setRpcUrl] = useState("https://eth-sepolia.g.alchemy.com/v2/RZMNlxQLB6s5mXe0rVElF"); // 可选：填你的 Alchemy/Infura RPC
+  const [tokenAddress, setTokenAddress] = useState("0xc8731481ddd213e81e77a00cb16b5a499a9f63be");
   const [targetAddress, setTargetAddress] = useState("0x5def82d23A4cB5AF793e7a1831B0e1b6356C9985");
   const [balance, setBalance] = useState(null);
   const [symbol, setSymbol] = useState("");
@@ -114,6 +114,7 @@ export default function TokenBalanceChecker() {
 
       // rawBalance 是 BigInt（wei-like），用 formatUnits 转换
       const human = formatUnits(rawBalance, decimals);
+      console.log(rawBalance, decimals, human)
       setBalance(human);
     } catch (err) {
       console.error(err);
@@ -127,7 +128,7 @@ export default function TokenBalanceChecker() {
     <div className="p-6 max-w-lg mx-auto bg-white rounded shadow space-y-4">
       <h3 className="text-xl font-semibold">调用ERC-20 balanceOf 方法</h3>
 
-      {/* <div className="space-y-2">
+      <div className="space-y-2">
         <label className="block text-sm">选择网络</label>
         <select
           value={chain}
@@ -137,9 +138,9 @@ export default function TokenBalanceChecker() {
           <option value="sepolia">Sepolia (测试网)</option>
           <option value="mainnet">Mainnet (主网)</option>
         </select>
-      </div> */}
+      </div>
 
-      {/* <div className="space-y-2">
+      <div className="space-y-2">
         <label className="block text-sm">可选 RPC（建议填 Alchemy / Infura / QuickNode URL）</label>
         <input
           placeholder="https://eth-mainnet.g.alchemy.com/v2/yourKey 或留空使用默认"
@@ -147,7 +148,7 @@ export default function TokenBalanceChecker() {
           onChange={(e) => setRpcUrl(e.target.value)}
           className="border p-2 rounded w-full"
         />
-      </div> */}
+      </div>
 
       <div className="space-y-2">
         <label className="block text-sm">ERC-20 合约地址</label>

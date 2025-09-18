@@ -15,16 +15,16 @@ const erc20Abi = [
     ],
   },
 ]
-
 export default function TransferWatcher() {
   const { address } = useAccount()
   const [isWatching, setIsWatching] = useState(false)
 
+  const CONTRACT_ADDRESS = '0xc8731481ddd213e81e77a00cb16b5a499a9f63be'
   // 只有 isWatching = true 时才会订阅事件
   useWatchContractEvent(
     isWatching
       ? {
-          address: '0xYourTokenAddress', // 替换成你的 Token 合约地址
+          address: CONTRACT_ADDRESS, // 替换成你的 Token 合约地址
           abi: erc20Abi,
           eventName: 'Transfer',
           args: { to: address }, // 只监听转给当前用户的
