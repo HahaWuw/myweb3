@@ -1,10 +1,8 @@
+import styles from '../styles/Home.module.css';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-
-import EthersButton from './ethersButton';
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -48,6 +46,15 @@ const Home: NextPage = () => {
             <p>Learn how to use ethers.</p>
             <p style={{'fontSize':'16px'}}>调用钱包读写、监听、转账功能</p>
             <button className={styles.coolbutton} style={{'color':'lightseagreen'}} onClick={() => router.push('/ethersButton')}>
+            go
+            </button>
+          </div>
+
+          <div className={styles.card} >
+            <h2>MetaNode Stake </h2>
+            {/* <p>多代币质押挖矿平台</p> */}
+            <p style={{'fontSize':'16px'}}>MetaNodeStake 是一个基于区块链的质押系统</p>
+            <button className={styles.coolbutton} style={{'color':'lightcoral'}} onClick={() => router.push('/stake')}>
             go
             </button>
           </div>

@@ -1,4 +1,4 @@
-import { useAccount, useBalance, useReadContract, useWriteContract, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useBalance, useReadContract, useWriteContract, useSendTransaction, useWaitForTransactionReceipt, useWatchContractEvent } from 'wagmi'
 import React from 'react'
 import { parseEther, parseUnits, erc20Abi } from 'viem'
 
@@ -20,29 +20,23 @@ export default function ContractInfo() {
       enabled: isConnected && !!address, // ✅ v2 必须写在 query 里
     },
   })
-
   const { data: decimals } = useReadContract({
     abi: erc20Abi,
     address: CONTRACT_ADDRESS,
     functionName: "decimals",
   })
-
   const formattedBalance =
   balance && decimals ? Number(balance) / 10 ** Number(decimals) : 0;
 
-  // const { data: hashWrite, writeContract } = useWriteContract()
-  // const { isLoading: iswriteConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
-  const { writeContract, isPending, data, error: writeError } = useWriteContract()
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS,
+    abi: erc20Abi,
+    eventName: 'Transfer',
+    onLogs(logs) {
+      console.log('New logs!', logs)
+    },
+  })
 
-  const handleTransfer = async () => {
-    await writeContract({
-      abi: erc20Abi,
-      address: CONTRACT_ADDRESS,  // ERC-20 合约地址
-      functionName: "transfer",
-      args: [address, BigInt(10000000000000000)], // 1.5 token (18 decimals)
-    })
-    console.log(isPending, data, writeError)
-  }
   return (
     <div style={{'padding': '20px'}}>
       <p style={{color: 'lightcoral'}}>wagmi连接钱包/读取余额/发送交易/调用合约balanceof方法/监听合约的transfer事件</p>
@@ -80,11 +74,11 @@ export default function ContractInfo() {
     
       <div>监听合约的transfer事件：
         {/* <TransferWatcher /> */}
-        <button onClick={handleTransfer} disabled={isPending}>
-          {isPending ? "交易中..." : "Transfer 1.5 TOKEN"}
-        </button>
-        {data && <p>交易哈希: {data.hash}</p>}
-        {writeError && <p style={{ color: "red" }}>错误: {writeError.message}</p>}
+        {/* <button onClick={handleTransfer}>
+          Transfer 1.5 TOKEN.  contract address:0xf46840de49a009db31995a4224902494b2a8b326
+        </button> */}
+        {/* {data && <p>交易哈希: {data.hash}</p>} */}
+        {/* {writeError && <p style={{ color: "red" }}>错误: {writeError.message}</p>} */}
       </div>
     </div>
   )
